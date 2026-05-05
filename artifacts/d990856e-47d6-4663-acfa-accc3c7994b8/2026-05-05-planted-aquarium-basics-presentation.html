@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planted Aquarium Basics</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --primary: #0a4d3c;
+      --accent: #2dd4bf;
+      --bg: #0f172a;
+      --text: #f1f5f9;
+      --card-bg: rgba(255, 255, 255, 0.05);
+    }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+      overflow-y: hidden;
+      background: var(--bg);
+      color: var(--text);
+    }
+    
+    .presentation-container {
+      display: flex;
+      scroll-snap-type: x mandatory;
+      overflow-x: auto;
+      overflow-y: hidden;
+      height: 100vh;
+      scroll-behavior: smooth;
+    }
+    
+    .slide {
+      min-width: 100vw;
+      height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 4rem;
+      position: relative;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+    
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(45, 212, 191, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    
+    .slide-content {
+      max-width: 1200px;
+      width: 100%;
+      z-index: 1;
+    }
+    
+    h1 {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--accent) 0%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+    }
+    
+    h2 {
+      font-size: 3rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      color: var(--accent);
+    }
+    
+    p {
+      font-size: 1.5rem;
+      line-height: 1.8;
+      color: #cbd5e1;
+      margin-bottom: 1.5rem;
+    }
+    
+    .subtitle {
+      font-size: 1.75rem;
+      color: #94a3b8;
+      font-weight: 400;
+    }
+    
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(45, 212, 191, 0.2);
+      border-radius: 1rem;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+      box-shadow: 0 10px 30px rgba(45, 212, 191, 0.2);
+    }
+    
+    .card h3 {
+      font-size: 1.75rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    
+    .card p {
+      font-size: 1.25rem;
+      color: #cbd5e1;
+    }
+    
+    ul {
+      list-style: none;
+      font-size: 1.5rem;
+      line-height: 2.5;
+    }
+    
+    ul li {
+      padding-left: 2rem;
+      position: relative;
+      color: #cbd5e1;
+    }
+    
+    ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: bold;
+    }
+    
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .icon-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(45, 212, 191, 0.2);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .icon-card:hover {
+      transform: scale(1.05);
+      border-color: var(--accent);
+    }
+    
+    .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .icon-card h4 {
+      font-size: 1.5rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    
+    .icon-card p {
+      font-size: 1.125rem;
+      color: #94a3b8;
+    }
+    
+    .slide-number {
+      position: absolute;
+      bottom: 2rem;
+      right: 2rem;
+      font-size: 0.875rem;
+      opacity: 0.5;
+      color: var(--accent);
+    }
+    
+    .nav-dots {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.75rem;
+      z-index: 1000;
+    }
+    
+    .nav-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(45, 212, 191, 0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid rgba(45, 212, 191, 0.5);
+    }
+    
+    .nav-dot.active {
+      background: var(--accent);
+      transform: scale(1.5);
+      box-shadow: 0 0 10px var(--accent);
+    }
+    
+    .highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    .big-number {
+      font-size: 5rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+    
+    .plant-visual {
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(to top, rgba(10, 77, 60, 0.3) 0%, transparent 100%);
+      border-radius: 1rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 2rem;
+      border: 1px solid rgba(45, 212, 191, 0.2);
+    }
+    
+    .plant {
+      width: 60px;
+      height: 200px;
+      background: linear-gradient(to top, var(--primary), var(--accent));
+      border-radius: 30px 30px 0 0;
+      position: relative;
+      animation: sway 3s ease-in-out infinite;
+    }
+    
+    .plant:nth-child(2) {
+      height: 150px;
+      animation-delay: 0.5s;
+    }
+    
+    .plant:nth-child(3) {
+      height: 180px;
+      animation-delay: 1s;
+    }
+    
+    .plant:nth-child(4) {
+      height: 140px;
+      animation-delay: 1.5s;
+    }
+    
+    @keyframes sway {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(3deg); }
+    }
+    
+    body.overview-mode .presentation-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      overflow-y: auto;
+      height: 100vh;
+    }
+    
+    body.overview-mode .slide {
+      min-width: 300px;
+      height: 200px;
+      transform: scale(0.2);
+      transform-origin: top left;
+      cursor: pointer;
+      border: 2px solid rgba(45, 212, 191, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="presentation-container" id="presentation">
+    
+    <!-- Slide 1: Title -->
+    <section class="slide" id="slide-1">
+      <div class="slide-content" style="text-align: center;">
+        <h1>Planted Aquarium Basics</h1>
+        <p class="subtitle">Transform Your Tank into a Thriving Underwater Garden</p>
+        <div class="plant-visual" style="margin-top: 3rem;">
+          <div class="plant"></div>
+          <div class="plant"></div>
+          <div class="plant"></div>
+          <div class="plant"></div>
+        </div>
+      </div>
+      <div class="slide-number">1 / 7</div>
+    </section>
+    
+    <!-- Slide 2: Why Planted Tanks -->
+    <section class="slide" id="slide-2">
+      <div class="slide-content">
+        <h2>Why Choose a Planted Aquarium?</h2>
+        <div class="grid-2">
+          <div>
+            <p>Planted aquariums create a <span class="highlight">natural ecosystem</span> that benefits both fish and aquarists.</p>
+            <ul style="margin-top: 2rem;">
+              <li>Natural filtration and oxygenation</li>
+              <li>Reduces algae growth</li>
+              <li>Provides shelter for fish</li>
+              <li>Creates stunning visual appeal</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Healthier Environment</h3>
+            <p>Live plants absorb harmful nitrates and produce oxygen, creating a balanced ecosystem that keeps your fish happy and healthy.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-number">2 / 7</div>
+    </section>
+    
+    <!-- Slide 3: Essential Equipment -->
+    <section class="slide" id="slide-3">
+      <div class="slide-content">
+        <h2>Essential Equipment</h2>
+        <div class="icon-grid">
+          <div class="icon-card">
+            <div class="icon">💡</div>
+            <h4>Lighting</h4>
+            <p>LED lights with 6500K spectrum for 8-10 hours daily</p>
+          </div>
+          <div class="icon-card">
+            <div class="icon">🌡️</div>
+            <h4>Substrate</h4>
+            <p>Nutrient-rich aqua soil or gravel with root tabs</p>
+          </div>
+          <div class="icon-card">
+            <div class="icon">🔄</div>
+            <h4>Filtration</h4>
+            <p>Gentle filter to maintain water quality without strong currents</p>
+          </div>
+          <div class="icon-card">
+            <div class="icon">💧</div>
+            <h4>CO₂ System</h4>
+            <p>Optional but beneficial for faster growth and vibrant colors</p>
+          </div>
+          <div class="icon-card">
+            <div class="icon">🧪</div>
+            <h4>Fertilizers</h4>
+            <p>Liquid nutrients for water column and root feeders</p>
+          </div>
+          <div class="icon-card">
+            <div class="icon">📊</div>
+            <h4>Test Kit</h4>
+            <p>Monitor pH, ammonia, nitrite, and nitrate levels</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-number">3 / 7</div>
+    </section>
+    
+    <!-- Slide 4: Beginner Plants -->
+    <section class="slide" id="slide-4">
+      <div class="slide-content">
+        <h2>Best Plants for Beginners</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Java Fern</h3>
+            <p>Hardy, low-light plant that attaches to rocks and driftwood. Perfect for beginners.</p>
+          </div>
+          <div class="card">
+            <h3>Anubias</h3>
+            <p>Slow-growing, nearly indestructible plant with beautiful broad leaves.</p>
+          </div>
+          <div class="card">
+            <h3>Amazon Sword</h3>
+            <p>Classic centerpiece plant with large, flowing leaves. Moderate light needs.</p>
+          </div>
+          <div class="card">
+            <h3>Java Moss</h3>
+            <p>Versatile carpeting plant that grows in almost any condition.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-number">4 / 7</div>
+    </section>
+    
+    <!-- Slide 5: The Nitrogen Cycle -->
+    <section class="slide" id="slide-5">
+      <div class="slide-content">
+        <h2>Understanding the Nitrogen Cycle</h2>
+        <div class="grid-2">
+          <div>
+            <div class="big-number">4-6</div>
+            <p style="font-size: 1.75rem; margin-bottom: 2rem;">weeks to establish</p>
+            <p>The nitrogen cycle is crucial for a healthy planted tank. Beneficial bacteria convert toxic ammonia into less harmful compounds.</p>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom: 1.5rem;">
+              <h3>Step 1: Ammonia (NH₃)</h3>
+              <p>Fish waste and decaying matter produce ammonia</p>
+            </div>
+            <div class="card" style="margin-bottom: 1.5rem;">
+              <h3>Step 2: Nitrite (NO₂)</h3>
+              <p>Bacteria convert ammonia to nitrite</p>
+            </div>
+            <div class="card">
+              <h3>Step 3: Nitrate (NO₃)</h3>
+              <p>Plants absorb nitrates as fertilizer</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-number">5 / 7</div>
+    </section>
+    
+    <!-- Slide 6: Maintenance -->
+    <section class="slide" id="slide-6">
+      <div class="slide-content">
+        <h2>Regular Maintenance Routine</h2>
+        <div class="grid-2">
+          <div>
+            <h3 style="color: var(--accent); margin-bottom: 1.5rem;">Weekly Tasks</h3>
+            <ul>
+              <li>25-30% water change</li>
+              <li>Trim dead or overgrown leaves</li>
+              <li>Clean glass from algae</li>
+              <li>Dose liquid fertilizers</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="color: var(--accent); margin-bottom: 1.5rem;">Monthly Tasks</h3>
+            <ul>
+              <li>Test water parameters</li>
+              <li>Clean filter media</li>
+              <li>Replant or propagate</li>
+              <li>Check equipment function</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card" style="margin-top: 2rem;">
+          <p style="text-align: center; font-size: 1.25rem;"><span class="highlight">Pro Tip:</span> Consistency is key! Regular small maintenance prevents major problems.</p>
+        </div>
+      </div>
+      <div class="slide-number">6 / 7</div>
+    </section>
+    
+    <!-- Slide 7: Common Challenges -->
+    <section class="slide" id="slide-7">
+      <div class="slide-content" style="text-align: center;">
+        <h2>Overcoming Common Challenges</h2>
+        <div class="icon-grid" style="margin-top: 3rem;">
+          <div class="icon-card">
+            <div class="icon">🦠</div>
+            <h4>Algae Blooms</h4>
+            <p>Reduce light duration, maintain CO₂ balance, and add algae eaters</p>
+          </div>
+          <div class="icon-card">
+            <div class="icon">🍂</div>
+            <h4>Yellowing Leaves</h4>
+            <p>Sign of nutrient deficiency—increase fertilizer dosing</p>
+          </div>
+          <div class="icon-card">
+            <div class="icon">📉</div>
+            <h4>Slow Growth</h4>
+            <p>Check lighting intensity, CO₂ levels, and nutrient availability</p>
+          </div>
+        </div>
+        <p style="margin-top: 3rem; font-size: 1.75rem;">With patience and proper care, you'll create a <span class="highlight">thriving underwater paradise</span>!</p>
+      </div>
+      <div class="slide-number">7 / 7</div>
+    </section>
+    
+  </div>
+  
+  <div class="nav-dots" id="nav-dots"></div>
+
+  <script>
+    const container = document.getElementById('presentation');
+    const slides = document.querySelectorAll('.slide');
+    const navDots = document.getElementById('nav-dots');
+
+    // Create navigation dots
+    slides.forEach((slide, index) => {
+      const dot = document.createElement('div');
+      dot.className = 'nav-dot' + (index === 0 ? ' active' : '');
+      dot.addEventListener('click', () => {
+        slide.scrollIntoView({ behavior: 'smooth' });
+      });
+      navDots.appendChild(dot);
+    });
+
+    // Update active dot on scroll
+    container.addEventListener('scroll', () => {
+      const scrollLeft = container.scrollLeft;
+      const slideWidth = slides[0].offsetWidth;
+      const activeIndex = Math.round(scrollLeft / slideWidth);
+      document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === activeIndex);
+      });
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      const currentScroll = container.scrollLeft;
+      const slideWidth = slides[0].offsetWidth;
+      if (e.key === 'ArrowRight') {
+        container.scrollLeft = currentScroll + slideWidth;
+      } else if (e.key === 'ArrowLeft') {
+        container.scrollLeft = currentScroll - slideWidth;
+      } else if (e.key === 'Escape') {
+        document.body.classList.toggle('overview-mode');
+      }
+    });
+
+    // Click to exit overview mode
+    slides.forEach((slide) => {
+      slide.addEventListener('click', () => {
+        if (document.body.classList.contains('overview-mode')) {
+          document.body.classList.remove('overview-mode');
+          setTimeout(() => slide.scrollIntoView({ behavior: 'smooth' }), 100);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
